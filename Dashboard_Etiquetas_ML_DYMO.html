@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADF Metales · Caso de Impacto · Etiquetas ML → DYMO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#041C2C; --navy2:#072A3F; --panel:#0A3047; --line:#16465F;
+    --cyan:#00A9F4; --cyan2:#34D1E6; --green:#22D39A; --amber:#FFC24B; --red:#FF6B6B;
+    --txt:#EAF4FA; --muted:#9DB6C6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Helvetica,Arial,sans-serif;background:var(--navy);color:var(--txt);
+       -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  a{color:var(--cyan);text-decoration:none}
+
+  header{position:sticky;top:0;z-index:20;background:rgba(4,28,44,.92);
+         backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.5px}
+  .brand .mark{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+        background:var(--cyan);color:var(--navy);border-radius:6px;font-weight:800}
+  .brand small{display:block;color:var(--muted);font-weight:400;font-size:11px;letter-spacing:2px}
+  .nav .right{display:flex;align-items:center;gap:22px}
+  .nav nav{display:flex;gap:22px;font-size:13px}
+  .nav nav a{color:var(--muted)} .nav nav a:hover{color:var(--txt)}
+  .langtog{display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;font-size:12px;font-weight:700}
+  .langtog button{background:transparent;color:var(--muted);border:0;padding:6px 12px;cursor:pointer}
+  .langtog button.on{background:var(--cyan);color:var(--navy)}
+
+  .hero{padding:64px 0 40px;border-bottom:1px solid var(--line);
+        background:radial-gradient(1100px 380px at 80% -10%,rgba(0,169,244,.18),transparent)}
+  .tag{display:inline-block;font-size:12px;letter-spacing:2px;color:var(--cyan);
+       border:1px solid var(--line);padding:6px 12px;border-radius:30px;margin-bottom:20px}
+  .hero h1{font-size:44px;line-height:1.1;letter-spacing:-.5px;max-width:880px}
+  .hero h1 b{color:var(--cyan)}
+  .hero p.sub{margin-top:18px;font-size:18px;color:var(--muted);max-width:720px}
+  .byline{margin-top:18px;font-size:14px;color:var(--muted)}
+  .byline b{color:var(--txt)}
+  .answer{margin-top:26px;background:linear-gradient(180deg,var(--panel),var(--navy2));
+       border:1px solid var(--line);border-left:4px solid var(--cyan);border-radius:10px;
+       padding:20px 24px;max-width:860px}
+  .answer .k{font-size:12px;letter-spacing:2px;color:var(--cyan);margin-bottom:6px}
+  .answer p{font-size:17px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:42px 0}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .kpi .v{font-size:40px;font-weight:800;letter-spacing:-1px;color:#fff;line-height:1}
+  .kpi .v.g{color:var(--green)} .kpi .v.c{color:var(--cyan2)}
+  .kpi .l{margin-top:10px;font-size:13px;color:var(--muted)}
+  .kpi .d{margin-top:8px;font-size:12px;color:var(--green);font-weight:600}
+
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  .ey{font-size:12px;letter-spacing:3px;color:var(--cyan);font-weight:700}
+  h2{font-size:28px;margin:8px 0 6px;letter-spacing:-.3px}
+  .lead{color:var(--muted);max-width:780px;margin-bottom:26px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card h3{font-size:16px;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--muted)}
+  .card .ic{width:40px;height:40px;border-radius:9px;background:rgba(0,169,244,.14);
+       display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+
+  .roi .v{font-size:34px;font-weight:800;color:var(--green);letter-spacing:-1px}
+  .roi .v.c{color:var(--cyan2)} .roi .v.w{color:#fff}
+  .roi .l{margin-top:8px;font-size:13px;color:var(--muted)}
+
+  .chartbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+  .chartbox h3{font-size:15px;margin-bottom:4px}
+  .chartbox .cap{font-size:12px;color:var(--muted);margin-bottom:14px}
+  .chartbox .insight{margin-top:14px;font-size:13px;color:var(--txt);
+       border-top:1px dashed var(--line);padding-top:12px}
+  .chartbox .insight b{color:var(--green)}
+
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .step{flex:1;min-width:150px;background:var(--navy2);border:1px solid var(--line);
+        border-radius:10px;padding:16px;text-align:center}
+  .step .n{font-size:11px;color:var(--cyan);letter-spacing:1px}
+  .step h4{font-size:15px;margin:6px 0}
+  .step p{font-size:12px;color:var(--muted)}
+  .arrow{display:flex;align-items:center;color:var(--cyan);font-size:22px;padding:0 8px}
+  .dymo{background:linear-gradient(180deg,#0E3B55,#0A3047);border-color:var(--cyan)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+  th{font-size:12px;letter-spacing:1px;color:var(--cyan);text-transform:uppercase}
+  td .pill{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600}
+  .pill.elim{background:rgba(34,211,154,.15);color:var(--green)}
+  .pill.red{background:rgba(255,194,75,.15);color:var(--amber)}
+
+  .road{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .road .card .ph{font-size:11px;letter-spacing:1px;color:var(--cyan)}
+
+  /* AUTOR */
+  .author{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;
+          background:linear-gradient(180deg,var(--panel),var(--navy2));
+          border:1px solid var(--line);border-radius:14px;padding:28px}
+  .avatar{width:96px;height:96px;border-radius:50%;background:var(--cyan);color:var(--navy);
+          display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800}
+  .author h3{font-size:22px}
+  .author .role{color:var(--muted);font-size:14px;margin:4px 0 12px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .tags span{font-size:12px;background:rgba(0,169,244,.12);border:1px solid var(--line);
+        color:var(--cyan2);padding:5px 11px;border-radius:20px}
+  .contact{display:flex;flex-wrap:wrap;gap:18px;font-size:14px;margin-top:6px}
+  .open{display:inline-block;margin-top:14px;background:rgba(34,211,154,.15);color:var(--green);
+        font-weight:700;font-size:13px;padding:8px 14px;border-radius:8px}
+
+  .note{font-size:12px;color:var(--muted);background:var(--navy2);border:1px dashed var(--line);
+        border-radius:8px;padding:12px 16px;margin-top:26px}
+  footer{padding:40px 0;color:var(--muted);font-size:13px;text-align:center}
+  @media(max-width:880px){.kpis,.grid2,.grid3,.grid4,.road{grid-template-columns:1fr 1fr}
+    .hero h1{font-size:32px} .nav nav{display:none} .author{grid-template-columns:1fr;text-align:center}
+    .avatar{margin:0 auto}.tags,.contact{justify-content:center}}
+  @media(max-width:560px){.kpis,.grid2,.grid3,.grid4,.road{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="mark">ADF</span>
+      <div>ADF METALES<small data-en="OPERATIONS &amp; PROCESS IMPROVEMENT">OPERACIONES &amp; MEJORA DE PROCESOS</small></div>
+    </div>
+    <div class="right">
+      <nav>
+        <a href="#reto" data-en="Challenge">El reto</a>
+        <a href="#solucion" data-en="Solution">La solución</a>
+        <a href="#impacto" data-en="Impact">Impacto</a>
+        <a href="#roi" data-en="ROI">ROI</a>
+        <a href="#autor" data-en="Author">Autor</a>
+      </nav>
+      <div class="langtog">
+        <button id="bES" class="on" onclick="setLang('es')">ES</button>
+        <button id="bEN" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <span class="tag" data-en="OPERATIONAL IMPACT CASE · E-COMMERCE FULFILLMENT">CASO DE IMPACTO OPERATIVO · E-COMMERCE FULFILLMENT</span>
+    <h1 data-en="From a manual bottleneck to <b>automated batch printing</b> in Mercado Libre dispatch.">De cuello de botella manual a <b>impresión automatizada por lote</b> en el despacho de Mercado Libre.</h1>
+    <p class="sub" data-en="A lightweight automation that eliminated label-by-label processing, standardized the process and freed operational capacity — with zero new hardware investment.">Una solución de automatización ligera que eliminó el procesamiento etiqueta-por-etiqueta,
+       estandarizó el proceso y liberó capacidad operativa — sin inversión en hardware nuevo.</p>
+    <p class="byline" data-en="Project by <b>Carlos G. Dumas</b> · Industrial Engineering · Tecnológico de Monterrey">Proyecto de <b>Carlos G. Dumas</b> · Ingeniería Industrial · Tecnológico de Monterrey</p>
+    <div class="answer">
+      <div class="k" data-en="THE ANSWER, FIRST">THE ANSWER, FIRST</div>
+      <p data-en="A <b>~91% reduction in printing time per label</b> and ~30 person-hours recovered per month, turning a fragile, single-person task into a standard process anyone on the team runs with one click."><b>Reducción de ~91% en el tiempo de impresión por etiqueta</b> y ~30 horas-persona
+         recuperadas al mes, convirtiendo una tarea frágil y dependiente de una persona en un
+         proceso estándar que cualquiera del equipo ejecuta con un clic.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="kpis">
+    <div class="kpi"><div class="v g">‑91%</div><div class="l" data-en="Time per label">Tiempo por etiqueta</div><div class="d">90s → 8s</div></div>
+    <div class="kpi"><div class="v c">~30 h</div><div class="l" data-en="Person-hours recovered / month">Horas-persona recuperadas / mes</div><div class="d" data-en="freed capacity">capacidad liberada</div></div>
+    <div class="kpi"><div class="v">1 → ∞</div><div class="l" data-en="People able to operate it">Personas capaces de operarlo</div><div class="d" data-en="standardized process">proceso estandarizado</div></div>
+    <div class="kpi"><div class="v g">‑92%</div><div class="l" data-en="Error reprints">Reimpresiones por error</div><div class="d">12% → 1%</div></div>
+  </div>
+
+  <section id="reto">
+    <div class="ey" data-en="01 · THE CHALLENGE">01 · EL RETO</div>
+    <h2 data-en="An incompatible format was stalling the entire dispatch">Un formato incompatible frenaba todo el despacho</h2>
+    <p class="lead" data-en="Mercado Libre delivers the label as <b>ZPL (.txt)</b> or letter-size PDF; the DYMO LabelWriter 4XL does not read ZPL and its software only opens <code>.label</code> files. The team processed each label by hand, with retries and unreadable barcodes.">Mercado Libre entrega la guía en <b>ZPL (.txt)</b> o PDF carta; la impresora
+       DYMO LabelWriter 4XL no interpreta ZPL y su software solo abre <code>.label</code>.
+       El equipo procesaba cada etiqueta a mano, con reintentos y códigos de barras ilegibles.</p>
+    <div class="grid3">
+      <div class="card"><div class="ic">⏱️</div><h3 data-en="Manual process">Proceso manual</h3><p data-en="Each label was downloaded, opened and adjusted one by one. No batch.">Cada etiqueta se descargaba, abría y ajustaba una por una. Sin lote.</p></div>
+      <div class="card"><div class="ic">❌</div><h3 data-en="Scaling errors">Errores de escala</h3><p data-en="Cropped labels and barcodes rejected by the carrier.">Etiquetas cortadas y códigos de barras que la paquetería rechazaba.</p></div>
+      <div class="card"><div class="ic">🧠</div><h3 data-en="Siloed knowledge">Conocimiento aislado</h3><p data-en="Only one person knew the 'trick'. No documented or standard process.">Solo una persona sabía el "truco". Sin proceso documentado ni estándar.</p></div>
+    </div>
+  </section>
+
+  <section id="solucion">
+    <div class="ey" data-en="02 · THE SOLUTION">02 · LA SOLUCIÓN</div>
+    <h2 data-en="Detect → Convert → Print, in one click">Detectar → Convertir → Imprimir, en un clic</h2>
+    <p class="lead" data-en="A lightweight desktop app (Python, no heavy dependencies) that automates the full flow and leaves the format decision to the software, not the operator.">Una app de escritorio ligera (Python, sin dependencias pesadas) que automatiza
+       el flujo completo y deja la decisión de formato en manos del software, no del operador.</p>
+    <div class="flow">
+      <div class="step"><div class="n">INPUT</div><h4 data-en="ML label">Etiqueta ML</h4><p>.txt (ZPL) / .pdf</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n" data-en="STEP 1">PASO 1</div><h4 data-en="Detection">Detección</h4><p data-en="Auto-identifies the type">Identifica el tipo automáticamente</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n" data-en="STEP 2">PASO 2</div><h4 data-en="Conversion">Conversión</h4><p>ZPL → PDF 4×6 (Labelary)</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><div class="n" data-en="STEP 3">PASO 3</div><h4 data-en="Printing">Impresión</h4><p data-en="Silent batch (SumatraPDF)">Lote silencioso (SumatraPDF)</p></div>
+      <div class="arrow">→</div>
+      <div class="step dymo"><div class="n">OUTPUT</div><h4>DYMO 4XL</h4><p data-en="Ready 4×6&quot; label">Etiqueta lista 4×6"</p></div>
+    </div>
+  </section>
+
+  <section id="impacto">
+    <div class="ey" data-en="03 · QUANTIFIED IMPACT">03 · IMPACTO CUANTIFICADO</div>
+    <h2 data-en="The numbers tell the story">Los números cuentan la historia</h2>
+    <p class="lead" data-en="Before vs. after the implementation, over a reference volume of <b>~60 labels/day</b>.">Comparativo del proceso antes vs. después de la implementación, sobre un volumen
+       de referencia de <b>~60 etiquetas/día</b>.</p>
+    <div class="grid2">
+      <div class="chartbox">
+        <h3 data-en="Time per label (seconds)">Tiempo por etiqueta (segundos)</h3>
+        <div class="cap" data-en="Manual vs. automated batch">Manual vs. automatizado por lote</div>
+        <canvas id="c1" height="220"></canvas>
+        <div class="insight" data-en="Insight: scale adjustment and retries were most of the manual time; batch removes them. <b>‑91% per label.</b>">Insight: el ajuste de escala y los reintentos eran el grueso del tiempo manual; el lote los elimina. <b>‑91% por etiqueta.</b></div>
+      </div>
+      <div class="chartbox">
+        <h3 data-en="Accumulated person-hours per month">Horas-persona acumuladas al mes</h3>
+        <div class="cap" data-en="Total time spent on printing">Tiempo total invertido en impresión</div>
+        <canvas id="c2" height="220"></canvas>
+        <div class="insight" data-en="Insight: <b>~30 h/month</b> recovered, reassignable to higher-value work (inventory control, quality).">Insight: se recuperan <b>~30 h/mes</b> reasignables a tareas de mayor valor (control de inventario, calidad).</div>
+      </div>
+      <div class="chartbox">
+        <h3 data-en="Error reprint rate (%)">Tasa de reimpresión por error (%)</h3>
+        <div class="cap" data-en="Output quality">Calidad del output</div>
+        <canvas id="c3" height="220"></canvas>
+        <div class="insight" data-en="Insight: standardizing density and 4×6 size cuts error from <b>12% to ~1%</b> → less consumable waste.">Insight: estandarizar densidad y tamaño 4×6 baja el error de <b>12% a ~1%</b> → menos desperdicio de consumible.</div>
+      </div>
+      <div class="chartbox">
+        <h3 data-en="Dispatch capacity (labels/hour)">Capacidad de despacho (etiquetas/hora)</h3>
+        <div class="cap" data-en="Process throughput">Throughput del proceso</div>
+        <canvas id="c4" height="220"></canvas>
+        <div class="insight" data-en="Insight: throughput goes from ~40 to <b>~450 labels/hour</b> effective in batch mode.">Insight: el throughput pasa de ~40 a <b>~450 etiquetas/hora</b> efectivas en modo lote.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROI -->
+  <section id="roi">
+    <div class="ey" data-en="04 · BUSINESS CASE">04 · CASO DE NEGOCIO</div>
+    <h2 data-en="Impact translated into money">El impacto traducido a dinero</h2>
+    <p class="lead" data-en="The decisive argument: hours saved and consumable not wasted, against a solution cost of zero (all free tools).">El argumento que decide: horas ahorradas y consumible no desperdiciado, contra un
+       costo de solución de cero (todas las herramientas son gratuitas).</p>
+    <div class="grid4 roi">
+      <div class="card"><div class="v w">$0</div><div class="l" data-en="Solution cost (Python, Labelary, SumatraPDF — all free)">Costo de la solución (Python, Labelary, SumatraPDF — todo gratis)</div></div>
+      <div class="card"><div class="v">~$2,100</div><div class="l" data-en="Monthly labor savings (≈30 h × $70/h MXN)">Ahorro de mano de obra / mes (≈30 h × $70/h MXN)</div></div>
+      <div class="card"><div class="v c">~$508</div><div class="l" data-en="Monthly consumable savings (~145 fewer wasted labels)">Ahorro de consumible / mes (~145 etiquetas menos desperdiciadas)</div></div>
+      <div class="card"><div class="v">~$31,300</div><div class="l" data-en="Estimated annual savings (MXN)">Ahorro anual estimado (MXN)</div></div>
+    </div>
+    <div class="grid3" style="margin-top:20px">
+      <div class="card"><div class="ic">⚡</div><h3 data-en="Immediate payback">Payback inmediato</h3><p data-en="With zero investment, savings are net from day one.">Con inversión cero, el ahorro es neto desde el día uno.</p></div>
+      <div class="card"><div class="ic">📈</div><h3 data-en="Scalable">Escalable</h3><p data-en="Replicable across stations and operations at no extra cost.">Replicable a otras estaciones y operaciones sin costo adicional.</p></div>
+      <div class="card"><div class="ic">♻️</div><h3 data-en="Less waste">Menos desperdicio</h3><p data-en="Fewer reprints = less material, energy and rework.">Menos reimpresiones = menos material, energía y retrabajo.</p></div>
+    </div>
+  </section>
+
+  <section id="lean">
+    <div class="ey" data-en="05 · LEAN LENS">05 · LENTE LEAN</div>
+    <h2 data-en="Wastes attacked">Desperdicios atacados</h2>
+    <p class="lead" data-en="The project doesn't just 'print faster': it attacks specific wastes in the flow.">El proyecto no solo "imprime más rápido": ataca desperdicios concretos del flujo.</p>
+    <table>
+      <thead><tr>
+        <th data-en="Waste (Lean)">Desperdicio (Lean)</th>
+        <th data-en="Before">Antes</th>
+        <th data-en="After">Después</th>
+        <th data-en="Result">Resultado</th>
+      </tr></thead>
+      <tbody>
+        <tr><td data-en="Waiting">Espera</td><td data-en="Open and adjust each PDF">Abrir y ajustar cada PDF</td><td data-en="Automatic batch">Lote automático</td><td><span class="pill elim" data-en="Eliminated">Eliminado</span></td></tr>
+        <tr><td data-en="Overprocessing">Sobreprocesamiento</td><td data-en="Manual conversion/adjustment">Conversión/ajuste manual</td><td data-en="Automatic detection">Detección automática</td><td><span class="pill elim" data-en="Eliminated">Eliminado</span></td></tr>
+        <tr><td data-en="Defects / rework">Defectos / retrabajo</td><td data-en="12% reprint">12% reimpresión</td><td data-en="~1% reprint">~1% reimpresión</td><td><span class="pill red">‑92%</span></td></tr>
+        <tr><td data-en="Motion">Movimiento</td><td data-en="Multiple clicks per label">Múltiples clics por etiqueta</td><td data-en="One click per batch">Un clic por lote</td><td><span class="pill elim" data-en="Eliminated">Eliminado</span></td></tr>
+        <tr><td data-en="Tacit knowledge">Conocimiento tácito</td><td data-en="Depended on 1 person">Dependía de 1 persona</td><td data-en="Standard process">Proceso estándar</td><td><span class="pill elim" data-en="Standardized">Estandarizado</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="roadmap">
+    <div class="ey" data-en="06 · ROADMAP">06 · ROADMAP</div>
+    <h2 data-en="From tool to system">De herramienta a sistema</h2>
+    <p class="lead" data-en="The next stage turns the app into a measurable, scalable operational asset.">La siguiente etapa convierte la app en un activo operativo medible y escalable.</p>
+    <div class="road">
+      <div class="card"><div class="ph" data-en="PHASE 1 · DONE">FASE 1 · HECHO</div><h3 data-en="Core automation">Automatización core</h3><p data-en="Batch convert + print in production.">Conversión + impresión por lote en producción.</p></div>
+      <div class="card"><div class="ph" data-en="PHASE 2">FASE 2</div><h3 data-en="Downloads watcher">Watcher de descargas</h3><p data-en="Auto-print on download, without opening the app.">Impresión automática al bajar la etiqueta, sin abrir la app.</p></div>
+      <div class="card"><div class="ph" data-en="PHASE 3">FASE 3</div><h3 data-en="Metrics dashboard">Tablero de métricas</h3><p data-en="Labels/day and errors exportable to Power BI.">Etiquetas/día y errores exportables a Power BI.</p></div>
+      <div class="card"><div class="ph" data-en="PHASE 4">FASE 4</div><h3 data-en=".exe distribution">Distribución .exe</h3><p data-en="Installable without Python to replicate on other stations.">Instalable sin Python para replicar en otras estaciones.</p></div>
+    </div>
+    <div class="note" data-en="⚠️ <b>Methodological note:</b> the figures in this dashboard are <b>illustrative estimates</b> based on operating assumptions (≈60 labels/day, 90s manual vs. 8s automated, $70/h MXN labor). Replace with real measurement (time 10 labels in each method) for the final report.">⚠️ <b>Nota metodológica:</b> las cifras de este tablero son <b>estimados ilustrativos</b>
+       basados en supuestos de operación (≈60 etiquetas/día, 90s manual vs. 8s automatizado, $70/h MXN de mano de obra).
+       Deben reemplazarse con medición real (cronometrar 10 etiquetas en cada método) para el reporte final.</div>
+  </section>
+
+  <!-- AUTOR -->
+  <section id="autor" style="border-bottom:none">
+    <div class="ey" data-en="ABOUT THE AUTHOR">SOBRE EL AUTOR</div>
+    <h2 data-en="Who built this">Quién lo construyó</h2>
+    <div class="author" style="margin-top:18px">
+      <div class="avatar">CD</div>
+      <div>
+        <h3>Carlos G. Dumas</h3>
+        <div class="role" data-en="Industrial Engineering student · Tecnológico de Monterrey — Operations, manufacturing &amp; process improvement.">Estudiante de Ingeniería Industrial · Tecnológico de Monterrey — Operaciones, manufactura y mejora de procesos.</div>
+        <div class="tags">
+          <span>Lean Manufacturing</span><span data-en="Process improvement">Mejora de procesos</span>
+          <span>VSM</span><span data-en="Automation">Automatización</span><span>Python</span>
+          <span data-en="Data analysis">Análisis de datos</span><span>Power BI</span>
+          <span data-en="Inventory control">Control de inventarios</span><span>MRP / MPS</span>
+        </div>
+        <div class="contact">
+          <a href="mailto:cgarciadumas@gmail.com">✉ cgarciadumas@gmail.com</a>
+          <a href="https://www.linkedin.com/in/tu-usuario" target="_blank">in/ LinkedIn (editar)</a>
+          <a href="https://github.com/tu-usuario" target="_blank">GitHub (editar)</a>
+        </div>
+        <span class="open" data-en="● Open to internships and operations / process improvement projects">● Abierto a prácticas y proyectos de operaciones / mejora de procesos</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div style="font-weight:700;color:var(--txt);font-size:15px">Etiquetas ML → DYMO 4XL</div>
+    <span data-en="Operational impact case · Industrial Engineering · Tecnológico de Monterrey">Caso de impacto operativo · Ingeniería Industrial · Tecnológico de Monterrey</span><br>
+    ADF Metales · <span data-en="Operations &amp; Process Improvement">Operaciones &amp; Mejora de Procesos</span>
+  </div>
+</footer>
+
+<script>
+  const NAVY='#041C2C', MUTED='#9DB6C6', LINE='#16465F';
+  Chart.defaults.color = MUTED;
+  Chart.defaults.font.family = "'Segoe UI',Arial,sans-serif";
+  const grid = {color:LINE, drawBorder:false};
+  const noLegend = {legend:{display:false}};
+  const charts = {};
+
+  charts.c1 = new Chart(c1,{type:'bar',
+    data:{labels:['Manual','App'],datasets:[{data:[90,8],backgroundColor:['#FF6B6B','#22D39A'],borderRadius:8,barThickness:80}]},
+    options:{plugins:noLegend,scales:{y:{grid,ticks:{callback:v=>v+'s'}},x:{grid:{display:false}}}}});
+  charts.c2 = new Chart(c2,{type:'bar',
+    data:{labels:['Manual','App'],datasets:[{data:[33,3],backgroundColor:['#FF6B6B','#00A9F4'],borderRadius:8,barThickness:80}]},
+    options:{plugins:noLegend,scales:{y:{grid,ticks:{callback:v=>v+' h'}},x:{grid:{display:false}}}}});
+  charts.c3 = new Chart(c3,{type:'bar',
+    data:{labels:['Manual','App'],datasets:[{data:[12,1],backgroundColor:['#FFC24B','#22D39A'],borderRadius:8,barThickness:80}]},
+    options:{plugins:noLegend,scales:{y:{grid,ticks:{callback:v=>v+'%'}},x:{grid:{display:false}}}}});
+  charts.c4 = new Chart(c4,{type:'bar',
+    data:{labels:['Manual','App'],datasets:[{data:[40,450],backgroundColor:['#FF6B6B','#34D1E6'],borderRadius:8,barThickness:80}]},
+    options:{plugins:noLegend,scales:{y:{grid},x:{grid:{display:false}}}}});
+
+  // i18n: guarda el ES original la primera vez y alterna con data-en
+  function setLang(l){
+    document.querySelectorAll('[data-en]').forEach(e=>{
+      if(e.dataset.es===undefined) e.dataset.es = e.innerHTML;
+      e.innerHTML = (l==='en') ? e.dataset.en : e.dataset.es;
+    });
+    document.documentElement.lang = l;
+    bES.classList.toggle('on', l==='es');
+    bEN.classList.toggle('on', l==='en');
+    const labels = (l==='en') ? ['Manual','App (batch)'] : ['Manual','App (lote)'];
+    Object.values(charts).forEach(ch=>{ ch.data.labels = labels; ch.update(); });
+  }
+  setLang('es');
+</script>
+</body>
+</html>
